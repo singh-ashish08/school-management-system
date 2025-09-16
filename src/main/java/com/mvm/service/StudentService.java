@@ -1,13 +1,17 @@
 package com.mvm.service;
 
-import com.mvm.entity.Student;
+import com.mvm.dto.StudentCreateDto;
+import com.mvm.dto.StudentDto;
+import com.mvm.dto.StudentResponseDto;
 
 public interface StudentService {
-	public  Student save(Student student);
+	public StudentCreateDto save(StudentCreateDto student);
 
-	public Student getById(long id);
+	public StudentResponseDto getById(long id);
 
-	public Student update(Student student);
+	public StudentDto getFullStudent(long id);	
+
+	public StudentCreateDto update(StudentCreateDto student);
 
 	public void delete(long id);
 
