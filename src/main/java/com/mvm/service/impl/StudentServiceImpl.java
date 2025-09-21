@@ -1,24 +1,28 @@
 package com.mvm.service.impl;
 
-import com.mvm.entity.Student;
+import java.util.List;
+
+import com.mvm.dto.StudentCreateDto;
+import com.mvm.dto.StudentDto;
+import com.mvm.dto.StudentResponseDto;
 import com.mvm.service.StudentService;
 
 public class StudentServiceImpl implements StudentService {
 
 	@Override
-	public Student save(Student student) {
+	public StudentCreateDto save(StudentCreateDto student) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Student getById(long id) {
+	public StudentResponseDto getById(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Student update(Student student) {
+	public StudentCreateDto update(StudentCreateDto student) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -27,6 +31,18 @@ public class StudentServiceImpl implements StudentService {
 	public void delete(long id) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public StudentDto getAllDetailsOfStudents(long id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<StudentDto> getAllStudents() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
