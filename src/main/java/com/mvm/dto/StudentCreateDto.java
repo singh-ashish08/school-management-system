@@ -2,35 +2,53 @@ package com.mvm.dto;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
 @Data
-
 public class StudentCreateDto {
-	private long id;
-	@NotEmpty
+	@NotNull
 	private String name;
+
 	@Email
 	private String email;
+
 	private String address;
-	@NotEmpty
+
+	@NotNull
 	private String phoneNumber;
+
 	private String course;
+
+	@NotNull
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate enrollmentDate;
-	private boolean status;
-	@NotEmpty
+
+	@NotNull
+	private Boolean status;
+
+	@NotNull
 	private String guardianName;
+
 	private String guardianContact;
-	@NotEmpty
-	private String dateOfBirth;
+
+	@NotNull
+	@JsonFormat(pattern = "yyyy-MM-dd")
+	private LocalDate dateOfBirth;
+
 	private String classSection;
-	private int rollNumber;
+	private Integer rollNumber;
 	private String bloodGroup;
 	private String emergencyContact;
 }

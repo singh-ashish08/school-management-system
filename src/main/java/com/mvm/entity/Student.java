@@ -19,19 +19,19 @@ import lombok.Setter;
 public class Student {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	private String name;
 	private String email;
 	private String address;
 	private String phoneNumber;
 	private String course;
 	private LocalDate enrollmentDate;
-	private boolean status;
+	private Boolean status;
 	private String guardianName;
 	private String guardianContact;
 	private String dateOfBirth;
 	private String classSection;
-	private int rollNumber;
+	private Integer rollNumber;
 	private String bloodGroup;
 	private String emergencyContact;
 }
