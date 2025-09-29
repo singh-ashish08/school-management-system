@@ -55,8 +55,8 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public void delete(long id) {
-		// TODO Auto-generated method stub
-
+Student student = studentRepository.findById(id).get();
+studentRepository.delete(student);
 	}
 
 	@Override
