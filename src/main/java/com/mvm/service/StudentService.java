@@ -14,6 +14,7 @@ public interface StudentService {
 	public List<StudentDto> getAllStudents();
 	
 	public StudentResponseDto getResponseById(long id);
+	public List<StudentResponseDto> getAllResponse();
 	public StudentDto getDtoById(long id);
 
 	public StudentCreateDto update(StudentCreateDto student);

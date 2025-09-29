@@ -48,6 +48,11 @@ public class StudentController {
 		StudentResponseDto studentRDto = studentService.getResponseById(id);
 		return  ResponseEntity.ok(studentRDto);
 	}
+	@GetMapping("/studentResponseDto/all")
+		public ResponseEntity<List<StudentResponseDto>> getAllResponse(){
+		List<StudentResponseDto> students = studentService.getAllResponse();
+			return new ResponseEntity<>(students,HttpStatus.OK);
+		}
 	
 	@GetMapping("/studentDto/{id}")
 	public ResponseEntity<StudentDto> getDtoById(Long id){
