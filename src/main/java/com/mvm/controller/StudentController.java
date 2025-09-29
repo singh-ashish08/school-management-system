@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mvm.dto.StudentCreateDto;
 import com.mvm.dto.StudentDto;
+import com.mvm.dto.StudentResponseDto;
 import com.mvm.service.StudentService;
 
 import jakarta.validation.Valid;
@@ -40,6 +41,18 @@ public class StudentController {
 	public ResponseEntity<List<StudentDto>> getAllStudents() {
 		List<StudentDto> students = studentService.getAllStudents();
 		return new ResponseEntity<>(students, HttpStatus.OK);
+	}
+	
+	@GetMapping("/studentResponseDto/{id}")
+	public ResponseEntity<StudentResponseDto> getResponseById(Long id){
+		StudentResponseDto studentRDto = studentService.getResponseById(id);
+		return  ResponseEntity.ok(studentRDto);
+	}
+	
+	@GetMapping("/studentDto/{id}")
+	public ResponseEntity<StudentDto> getDtoById(Long id){
+		StudentDto studentDto = studentService.getDtoById(id);
+		return  ResponseEntity.ok(studentDto);
 	}
 
 }
