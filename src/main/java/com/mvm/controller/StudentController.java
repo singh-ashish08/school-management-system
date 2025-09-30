@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,11 +49,21 @@ public class StudentController {
 		StudentResponseDto studentRDto = studentService.getResponseById(id);
 		return  ResponseEntity.ok(studentRDto);
 	}
+	@GetMapping("/studentResponseDto/all")
+		public ResponseEntity<List<StudentResponseDto>> getAllResponse(){
+		List<StudentResponseDto> students = studentService.getAllResponse();
+			return new ResponseEntity<>(students,HttpStatus.OK);
+		}
 	
 	@GetMapping("/studentDto/{id}")
 	public ResponseEntity<StudentDto> getDtoById(Long id){
 		StudentDto studentDto = studentService.getDtoById(id);
 		return  ResponseEntity.ok(studentDto);
+	}
+	@DeleteMapping("/delete/{id}")		
+	public ResponseEntity<String> deleteById(long id){
+		 studentService.delete(id);
+		return ResponseEntity.ok("Student record deleted successfully");	
 	}
 
 }
