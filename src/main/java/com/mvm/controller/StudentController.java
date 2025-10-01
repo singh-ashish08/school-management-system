@@ -43,27 +43,29 @@ public class StudentController {
 		List<StudentDto> students = studentService.getAllStudents();
 		return new ResponseEntity<>(students, HttpStatus.OK);
 	}
-	
-	@GetMapping("/studentResponseDto/{id}")
-	public ResponseEntity<StudentResponseDto> getResponseById(Long id){
+
+	@GetMapping("/lessDetails/{id}")
+	public ResponseEntity<StudentResponseDto> getResponseById(Long id) {
 		StudentResponseDto studentRDto = studentService.getResponseById(id);
-		return  ResponseEntity.ok(studentRDto);
+		return ResponseEntity.ok(studentRDto);
 	}
-	@GetMapping("/studentResponseDto/all")
-		public ResponseEntity<List<StudentResponseDto>> getAllResponse(){
+
+	@GetMapping("/lessDetails/all")
+	public ResponseEntity<List<StudentResponseDto>> getAllResponse() {
 		List<StudentResponseDto> students = studentService.getAllResponse();
-			return new ResponseEntity<>(students,HttpStatus.OK);
-		}
-	
-	@GetMapping("/studentDto/{id}")
-	public ResponseEntity<StudentDto> getDtoById(Long id){
-		StudentDto studentDto = studentService.getDtoById(id);
-		return  ResponseEntity.ok(studentDto);
+		return new ResponseEntity<>(students, HttpStatus.OK);
 	}
-	@DeleteMapping("/delete/{id}")		
-	public ResponseEntity<String> deleteById(long id){
-		 studentService.delete(id);
-		return ResponseEntity.ok("Student record deleted successfully");	
+
+	@GetMapping("/fullDetailsBy/{id}")
+	public ResponseEntity<StudentDto> getDtoById(Long id) {
+		StudentDto studentDto = studentService.getDtoById(id);
+		return ResponseEntity.ok(studentDto);
+	}
+
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity<String> deleteById(long id) {
+		studentService.delete(id);
+		return ResponseEntity.ok("Student record deleted successfully");
 	}
 
 }
