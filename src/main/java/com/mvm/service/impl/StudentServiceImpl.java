@@ -74,7 +74,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public StudentDto getAllDetailsOfStudents(long id) {
+	public StudentDto getAllDetailsOfStudent(long id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
