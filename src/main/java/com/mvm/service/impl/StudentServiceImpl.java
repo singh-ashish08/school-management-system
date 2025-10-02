@@ -1,6 +1,7 @@
 package com.mvm.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,14 +32,23 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public StudentResponseDto getResponseById(long id) {
-		Student student = studentRepository.findById(id).get();
-		return modelMapper.map(student, StudentResponseDto.class);
+		Optional<Student> student = studentRepository.findById(id);
+		if (!student.isPresent()) {
+			throw new RuntimeException("Student not found with the given id: " + id);
+		} else {
+			return modelMapper.map(student.get(), StudentResponseDto.class);
+		}
 	}
 
 	@Override
 	public StudentDto getDtoById(long id) {
-		Student student = studentRepository.findById(id).get();
-		return modelMapper.map(student, StudentDto.class);
+		Optional<Student> student = studentRepository.findById(id);
+		;
+		if (student.isPresent()) {
+			return modelMapper.map(student.get(), StudentDto.class);
+		} else {
+			throw new RuntimeException("Student not found with the given id: " + id);
+		}
 	}
 
 	@Override
@@ -55,8 +65,12 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public void delete(long id) {
-		Student student = studentRepository.findById(id).get();
-		studentRepository.delete(student);
+		Optional<Student> student = studentRepository.findById(id);
+		if (!student.isPresent()) {
+			throw new RuntimeException("Student not found with the given id: " + id);
+		} else {
+			studentRepository.deleteById(id);
+		}
 	}
 
 	@Override
