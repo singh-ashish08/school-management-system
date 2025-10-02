@@ -9,7 +9,7 @@ import com.mvm.dto.StudentResponseDto;
 public interface StudentService {
 	public StudentCreateDto save(StudentCreateDto student);
 
-	public StudentDto getAllDetailsOfStudents(long id);
+	public StudentDto getAllDetailsOfStudent(long id);
 
 	public List<StudentDto> getAllStudents();
 	
