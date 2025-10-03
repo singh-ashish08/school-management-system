@@ -2,15 +2,15 @@ package com.mvm.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.mvm.exception.ApiResponse;
 import com.mvm.exception.ResourceNotFoundException;
 
 import jakarta.servlet.http.HttpServletRequest;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionController {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiResponse> handleResourceNotFoundException(ResourceNotFoundException ex,

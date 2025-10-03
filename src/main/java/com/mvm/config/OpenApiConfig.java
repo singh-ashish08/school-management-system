@@ -15,7 +15,7 @@ public class OpenApiConfig {
 	public OpenAPI schoolManagementOpenAPI() {
 		return new OpenAPI().info(new Info().title("Maharishi Vidya Mandir School API")
 				.description("API documentation for School Management System built with Spring Boot").version("1.0.0")
-				.contact(new Contact().name("Ashish Singh").email("your-email@example.com")
+				.contact(new Contact().name("Ashish Singh").email("ashishsinghvtf@example.com")
 						.url("https://github.com/singh-ashish08"))
 				.license(new License().name("Apache 2.0").url("http://springdoc.org")));
 	}
