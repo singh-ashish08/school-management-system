@@ -24,7 +24,6 @@ public class StudentServiceImpl implements StudentService {
 
 	@Override
 	public StudentCreateDto save(StudentCreateDto student) {
-		// TODO Auto-generated method stub
 		Student studentDB = modelMapper.map(student, Student.class);
 		Student savedStudent = studentRepository.save(studentDB);
 		return modelMapper.map(savedStudent, StudentCreateDto.class);
@@ -85,6 +84,12 @@ public class StudentServiceImpl implements StudentService {
 		List<Student> all = studentRepository.findAll();
 		List<StudentDto> list = all.stream().map(x -> modelMapper.map(x, StudentDto.class)).toList();
 		return list;
+	}
+
+	@Override
+	public StudentResponseDto findByName(String name) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
