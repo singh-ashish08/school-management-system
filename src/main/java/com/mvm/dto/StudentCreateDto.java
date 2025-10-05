@@ -17,7 +17,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Data
-public class StudentCreateDto {
+public class StudentCreateDto {//having 14 fields
 	@NotNull
 	private String name;
 

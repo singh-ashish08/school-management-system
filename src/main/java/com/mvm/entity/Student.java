@@ -16,7 +16,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Student {
+public class Student { //having 15 fields including id
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
@@ -29,7 +29,7 @@ public class Student {
 	private Boolean status;
 	private String guardianName;
 	private String guardianContact;
-	private String dateOfBirth;
+	private LocalDate dateOfBirth;
 	private String classSection;
 	private Integer rollNumber;
 	private String bloodGroup;
