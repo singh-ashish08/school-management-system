@@ -11,6 +11,7 @@ import com.mvm.dto.StudentCreateDto;
 import com.mvm.dto.StudentDto;
 import com.mvm.dto.StudentResponseDto;
 import com.mvm.entity.Student;
+import com.mvm.exception.ResourceNotFoundException;
 import com.mvm.repository.StudentRepository;
 import com.mvm.service.StudentService;
 
@@ -43,7 +44,7 @@ public class StudentServiceImpl implements StudentService {
 	@Override
 	public StudentDto getDtoById(long id) {
 		Optional<Student> student = studentRepository.findById(id);
-		;
+		
 		if (student.isPresent()) {
 			return modelMapper.map(student.get(), StudentDto.class);
 		} else {
@@ -58,9 +59,31 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
-	public StudentCreateDto update(StudentCreateDto student) {
-		// TODO Auto-generated method stub
-		return null;
+	public StudentCreateDto update(StudentCreateDto student,long id) {
+		Student stu = new Student();
+		Optional<Student> getStudentFromDB = studentRepository.findById(id);
+		if(!getStudentFromDB.isPresent()) {
+			throw new ResourceNotFoundException("Student not found with the given id: " + id);
+		}else {
+		stu.setAddress(student.getAddress());
+		stu.setBloodGroup(student.getBloodGroup());
+		stu.setClassSection(student.getClassSection());
+		stu.setCourse(student.getCourse());
+		stu.setDateOfBirth(student.getDateOfBirth());
+		stu.setEmail(student.getEmail());
+		stu.setEmergencyContact(student.getEmergencyContact());
+		stu.setEnrollmentDate(student.getEnrollmentDate());
+		stu.setGuardianContact(student.getGuardianContact());
+		stu.setGuardianName(student.getGuardianName());
+		stu.setName(student.getName());
+		stu.setPhoneNumber(student.getPhoneNumber());
+		stu.setRollNumber(student.getRollNumber());
+		stu.setStatus(student.getStatus());
+		
+		}
+		Student updatedStudent = studentRepository.save(stu);
+		
+		return modelMapper.map(updatedStudent, StudentCreateDto.class);
 	}
 
 	@Override

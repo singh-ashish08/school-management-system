@@ -12,13 +12,15 @@ public interface StudentService {
 	public StudentDto getAllDetailsOfStudent(long id);
 
 	public List<StudentDto> getAllStudents();
-	
+
 	public StudentResponseDto getResponseById(long id);
+
 	public List<StudentResponseDto> getAllResponse();
+
 	public StudentDto getDtoById(long id);
 
-	public StudentCreateDto update(StudentCreateDto student);
-
 	public void delete(long id);
+
+	StudentCreateDto update(StudentCreateDto student, long id);
 
 }

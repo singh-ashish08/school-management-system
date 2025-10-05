@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StudentResponseDto {
+public class StudentResponseDto { //having 10 fields
 	private String name;
 	private String address;
 	private String phoneNumber;
