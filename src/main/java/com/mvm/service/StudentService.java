@@ -19,8 +19,10 @@ public interface StudentService {
 
 	public StudentDto getDtoById(long id);
 
+	public StudentDto getDtoById(long id);
+
 	public void delete(long id);
 
-	StudentCreateDto update(StudentCreateDto student, long id);
+	public StudentResponseDto findByName(String name);
 
 }
