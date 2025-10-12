@@ -2,19 +2,18 @@ package com.mvm.controller;
 
 //Mockito static helpers
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 //MockMvc static helpers
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
 
+import ch.qos.logback.core.encoder.EchoEncoder;
+import com.mvm.exception.DuplicateResourceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -87,4 +86,102 @@ public class StudentControllerTest {
 		verify(studentService, times(1)).save(captor.capture());
 	}
 
+	@Test
+	public void createStudent_whenMissingRequiredField_thenReturns400()throws Exception{
+		String invalidJson = """
+            {
+              "email": "john.doe@example.com",
+              "phoneNumber": "9876543210",
+              "enrollmentDate": "2023-09-01",
+              "status": true,
+              "guardianName": "Mr Guardian",
+              "dateOfBirth": "2005-06-15"
+            }
+            """;
+
+		// Act & Assert: expect 400 Bad Request
+		mockMvc.perform(post(URL)
+						// add basic auth + csrf if your security requires them (you used them above)
+						.with(httpBasic("deepa", "ashish"))
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(invalidJson))
+				.andExpect(status().isBadRequest());
+
+		// Verify service NOT called because validation should fail before hitting the service.
+		verify(studentService, times(0)).save(any(StudentCreateDto.class));
+	}
+
+
+	@Test
+	public void createStudent_whenInvalidField_thenReturns400()throws Exception{
+		String inValidJson= """
+				 {
+				 "name":"ashish",
+				 "email": "john.doe@example.com",
+              "phoneAumber": "9876543210",
+              "enrollmentDate": "2023-09-01",
+              "status": true,
+              "guardianName": "Mr Guardian",
+              "dateOfBirth": "2005-06-15"
+				}""";
+		mockMvc.perform(post(URL).with(csrf()).with(httpBasic("deepa","ashish"))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				.content(inValidJson)).andExpect(status().isBadRequest());
+		verify(studentService,times(0)).save(any(StudentCreateDto.class));
+	}
+    @Test
+	@DisplayName("POST /students/add - malformed JSON returns 400")
+	public void createStudent_whenInvalidJson_thenReturns400()throws Exception{
+		String inValidJson= """
+				"name":"ashish",
+				 "email": "john.doe@example.com",
+              "phoneNumber": "9876543210",
+              "enrollmentDate": "2023-09-01",
+              "status": true,
+              "guardianName": "Mr Guardian",
+              "dateOfBirth": "2005-06-15"
+				""";
+		mockMvc.perform(post(URL).with(httpBasic("deepa","ashish"))
+				.with(csrf()).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(inValidJson)).andExpect(status().isBadRequest());
+		verify(studentService,times(0)).save(any(StudentCreateDto.class));
+		verifyNoInteractions(studentService);
+}
+
+
+	@Test
+	@DisplayName("POST /students/add - duplicate student returns 409 Conflict")
+	public void createStudent_whenDuplicate_thenReturns409() throws Exception {
+		// Arrange: JSON representing an already existing student
+		String duplicateJson = """
+    {
+      "name": "Ashish",
+      "email": "john.doe@example.com",
+      "phoneNumber": "9876543210",
+      "enrollmentDate": "2023-09-01",
+      "status": true,
+      "guardianName": "Mr Guardian",
+      "dateOfBirth": "2005-06-15"
+    }
+    """;
+
+		// Mock behavior: service throws custom exception when duplicate found
+		when(studentService.save(any(StudentCreateDto.class)))
+				.thenThrow(new DuplicateResourceException("Student already exists with same email"));
+
+		// Act + Assert
+		mockMvc.perform(post(URL)
+						.with(httpBasic("deepa", "ashish"))
+						.with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.accept(MediaType.APPLICATION_JSON)
+						.content(duplicateJson))
+				.andExpect(status().isConflict())  // 409 Conflict
+				.andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+				.andExpect(jsonPath("$.error").value("Conflict"))
+				.andExpect(jsonPath("$.message").value("Student already exists with same email"));
+
+		verify(studentService, times(1)).save(any(StudentCreateDto.class));
+	}
 }
