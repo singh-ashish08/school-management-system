@@ -74,8 +74,10 @@ public class StudentControllerTest {
 		when(studentService.save(any(StudentCreateDto.class))).thenReturn(validDto);
 
 		// Act + Assert
-		mockMvc.perform(post(URL).with(httpBasic("deepa","ashish")).with(csrf()).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(validDto))).andExpect(status().isCreated())
+		mockMvc.perform(post(URL).with(httpBasic("deepa","ashish"))
+				                 .with(csrf())
+				                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				                 .content(objectMapper.writeValueAsString(validDto))).andExpect(status().isCreated())
 				// .andExpect(content.contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.name").value("John Doe"))
 				.andExpect(jsonPath("$.email").value("john.doe@example.com"))
