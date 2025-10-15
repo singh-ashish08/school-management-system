@@ -12,6 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,13 +25,19 @@ public class SecurityConfig {
 	@Autowired
 	private UserDetailsService  userDetailsService;//we have to provide implementation for this interface on service layer
 	
+	 @Bean
+	    public BCryptPasswordEncoder passwordEncoder() {
+	        return new BCryptPasswordEncoder(12);
+	    }
+	
 	@Bean
 	public AuthenticationProvider authProvider() { // used to provide authentication to user
 		
-		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();//Dao...to connect with database
+		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();//to connect with database
 		provider.setUserDetailsService(userDetailsService);
-		provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());//NoOpPasswordEncoder is used when we don't need encoded password
-		return provider;
+		//provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());//NoOpPasswordEncoder is used when we don't need encoded password
+		provider.setPasswordEncoder(passwordEncoder()); // ✅ use Spring bean line no. 28
+        return provider;
 		
 	}
 	
