@@ -13,7 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDate;
 
 import ch.qos.logback.core.encoder.EchoEncoder;
+import com.mvm.exception.ApiResponse;
 import com.mvm.exception.DuplicateResourceException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mvm.dto.StudentCreateDto;
 import com.mvm.service.StudentService;
+import org.springframework.test.web.servlet.MvcResult;
 
 @WebMvcTest(StudentController.class)
 //@AutoConfigureMockMvc(addFilters = false)   // <- disables Spring Security filters for this test
@@ -87,7 +90,10 @@ public class StudentControllerTest {
 	}
 
 	@Test
-	public void createStudent_whenMissingRequiredField_thenReturns400()throws Exception{
+	@DisplayName("CreateStudent : whenMissingRequiredField_thenReturns400 and proper ApiResponse")
+	void createStudent_whenMissingRequiredField_thenReturns400() throws Exception {
+
+		// JSON missing the required 'name' field
 		String invalidJson = """
             {
               "email": "john.doe@example.com",
@@ -99,18 +105,35 @@ public class StudentControllerTest {
             }
             """;
 
-		// Act & Assert: expect 400 Bad Request
-		mockMvc.perform(post(URL)
-						// add basic auth + csrf if your security requires them (you used them above)
+		// Perform request and capture response
+		MvcResult result = mockMvc.perform(post(URL)
 						.with(httpBasic("deepa", "ashish"))
 						.with(csrf())
 						.contentType(MediaType.APPLICATION_JSON)
 						.accept(MediaType.APPLICATION_JSON)
 						.content(invalidJson))
-				.andExpect(status().isBadRequest());
+				.andExpect(status().isBadRequest()) // still keep HTTP check
+				.andReturn();
 
-		// Verify service NOT called because validation should fail before hitting the service.
-		verify(studentService, times(0)).save(any(StudentCreateDto.class));
+		// Deserialize response body
+		String responseBody = result.getResponse().getContentAsString();
+		ApiResponse apiResponse = objectMapper.readValue(responseBody, ApiResponse.class);
+
+		// ---- SEPARATE ASSERTIONS ----
+		Assertions.assertEquals(400, apiResponse.getStatus(),
+				"Status code should be 400 for missing required field");
+
+		Assertions.assertEquals("Bad Request", apiResponse.getError(),
+				"Error field should indicate Bad Request");
+
+		Assertions.assertTrue(apiResponse.getMessage().toLowerCase().contains("name"),
+				"Error message should mention missing field 'name'");
+
+		Assertions.assertEquals(URL, apiResponse.getPath(),
+				"Path should match the endpoint URI");
+
+		// Verify service was never called
+		verifyNoInteractions(studentService);
 	}
 
 
