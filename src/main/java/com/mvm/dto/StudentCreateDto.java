@@ -17,36 +17,26 @@ import lombok.Setter;
 @Setter
 @Getter
 @Data
-public class StudentCreateDto {//having 14 fields
+public class StudentCreateDto { //having 14 fields
 	@NotNull
 	private String name;
-
 	@Email
 	private String email;
-
 	private String address;
-
 	@NotNull
 	private String phoneNumber;
-
 	private String course;
-
 	@NotNull
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate enrollmentDate;
-
 	@NotNull
 	private Boolean status;
-
 	@NotNull
 	private String guardianName;
-
 	private String guardianContact;
-
 	@NotNull
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private LocalDate dateOfBirth;
-
 	private String classSection;
 	private Integer rollNumber;
 	private String bloodGroup;

@@ -2,13 +2,17 @@ package com.mvm.controller;
 
 //Mockito static helpers
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 //MockMvc static helpers
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 
@@ -21,14 +25,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mvm.dto.StudentCreateDto;
+import com.mvm.exception.ApiResponse;
+import com.mvm.exception.DuplicateResourceException;
 import com.mvm.service.StudentService;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -77,8 +83,10 @@ public class StudentControllerTest {
 		when(studentService.save(any(StudentCreateDto.class))).thenReturn(validDto);
 
 		// Act + Assert
-		mockMvc.perform(post(URL).with(httpBasic("deepa","ashish")).with(csrf()).contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(validDto))).andExpect(status().isCreated())
+		mockMvc.perform(post(URL).with(httpBasic("deepa","ashish"))
+				                 .with(csrf())
+				                 .contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON)
+				                 .content(objectMapper.writeValueAsString(validDto))).andExpect(status().isCreated())
 				// .andExpect(content.contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.name").value("John Doe"))
 				.andExpect(jsonPath("$.email").value("john.doe@example.com"))
@@ -206,5 +214,43 @@ public class StudentControllerTest {
 				.andExpect(jsonPath("$.message").value("Student already exists with same email"));
 
 		verify(studentService, times(1)).save(any(StudentCreateDto.class));
+	}
+	@Test
+	@DisplayName("POST /students/add -internalServerError")
+	public void createStudent_whenServiceError_thenReturns500() throws Exception{
+		String jsonObject="""
+				{
+				"name": "Ashish",
+                "email": "john.doe@example.com",
+                "phoneNumber": "9876543210",
+                "enrollmentDate": "2023-09-01",
+                "status": true,
+                "guardianName": "Mr Guardian",
+                "dateOfBirth": "2005-06-15"
+				}
+				""";
+		when(studentService.save(any(StudentCreateDto.class))).thenThrow(new RuntimeException("error"));
+		MvcResult result = mockMvc.perform(post(URL).with(httpBasic("deepa","ashish")).with(csrf())
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON).content(jsonObject))
+		        .andExpect(status().isInternalServerError()).andReturn();
+		String responseBody = result.getResponse().getContentAsString();
+	    ApiResponse apiResponse = objectMapper.readValue(responseBody, ApiResponse.class);
+
+	    // ---- Assertions ----
+	    Assertions.assertEquals(500, apiResponse.getStatus(),
+	            "Status should be 500 for internal errors");
+
+	    Assertions.assertEquals("Internal Server Error", apiResponse.getError(),
+	            "Error field should indicate internal server error");
+
+	    Assertions.assertTrue(apiResponse.getMessage().contains("error"),
+	            "Message should include the exception message from the service layer");
+
+	    Assertions.assertEquals(URL, apiResponse.getPath(),
+	            "Path should match the request URL");
+
+	    // Verify service called once
+	    verify(studentService, times(1)).save(any(StudentCreateDto.class));
+		
 	}
 }

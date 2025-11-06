@@ -33,8 +33,9 @@ public class TestController {
 	}
 
 	@PostMapping("/test")
-	public void test(@RequestBody String body) {
+	public ResponseEntity<String> test(@RequestBody String body) {
 		log.info("RAW BODY: {}", body);
+		return new ResponseEntity(body,HttpStatus.OK);
 	}
 
 }
