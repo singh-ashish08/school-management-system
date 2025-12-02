@@ -27,7 +27,8 @@ public class SecurityConfig {
 	
 	 @Bean
 	    public BCryptPasswordEncoder passwordEncoder() {
-	        return new BCryptPasswordEncoder(12);
+
+         return new BCryptPasswordEncoder(12);
 	    }
 	
 	@Bean
@@ -46,7 +47,7 @@ public class SecurityConfig {
 	@Bean
 	public  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 	
 		http.csrf(customizer->customizer.disable());//disable default csrf
-		http.authorizeHttpRequests(request->request.anyRequest().authenticated());//enable authentication for any request
+		http.authorizeHttpRequests(request->request.anyRequest().authenticated());//enable authentication for any/all requests
 		//http.formLogin(Customizer.withDefaults());//to get default login form-we dont need formlogin for stateless
 		http.httpBasic(Customizer.withDefaults());//to get the basic auth on postman
 		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));//to create a new session for every request/stateless 
