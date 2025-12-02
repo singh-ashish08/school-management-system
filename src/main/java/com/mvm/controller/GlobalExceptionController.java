@@ -18,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class GlobalExceptionController {
 	@ExceptionHandler(ResourceNotFoundException.class)
 	public ResponseEntity<ApiResponse> handleResourceNotFoundException(ResourceNotFoundException ex,
-			HttpServletRequest request) {
+			                                                           HttpServletRequest request) {
 		ApiResponse apiResponse = new ApiResponse();
 		apiResponse.setStatus(HttpStatus.NOT_FOUND.value());
 		apiResponse.setError("Not Found");
