@@ -27,9 +27,10 @@ public class TestController {
 	}
 	@GetMapping("/hello")
 	public ResponseEntity<String> sayHello(HttpServletRequest request) {
-		String sessionId = request.getSession().getId();
-		String message = "Hello, welcome to Maharishi Vidya Mandir School, "+"SessionId = "+sessionId;
-		return new ResponseEntity(message,HttpStatus.OK);
+	//	String sessionId = request.getSession().getId();
+		String message = "Hello, welcome to Maharishi Vidya Mandir School";
+	//	String message="Hello World";
+        return new ResponseEntity(message,HttpStatus.OK);
 	}
 
 	@PostMapping("/test")

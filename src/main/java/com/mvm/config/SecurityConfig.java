@@ -26,7 +26,7 @@ public class SecurityConfig {
 	private UserDetailsService  userDetailsService;//we have to provide implementation for this interface on service layer
 	
 	 @Bean
-	    public BCryptPasswordEncoder passwordEncoder() {
+	    public BCryptPasswordEncoder bCryptPasswordEncoder() {
 
          return new BCryptPasswordEncoder(12);
 	    }
@@ -37,7 +37,7 @@ public class SecurityConfig {
 		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();//to connect with database
 		provider.setUserDetailsService(userDetailsService);
 		//provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());//NoOpPasswordEncoder is used when we don't need encoded password
-		provider.setPasswordEncoder(passwordEncoder()); // ✅ use Spring bean line no. 28
+		provider.setPasswordEncoder(bCryptPasswordEncoder()); // ✅ use Spring bean line no. 28
         return provider;
 		
 	}
@@ -47,9 +47,20 @@ public class SecurityConfig {
 	@Bean
 	public  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 	
 		http.csrf(customizer->customizer.disable());//disable default csrf
-		http.authorizeHttpRequests(request->request.anyRequest().authenticated());//enable authentication for any/all requests
-		//http.formLogin(Customizer.withDefaults());//to get default login form-we dont need formlogin for stateless
-		http.httpBasic(Customizer.withDefaults());//to get the basic auth on postman
+		http.authorizeHttpRequests(request->request
+                // Swagger should be public
+                .requestMatchers(
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                ).permitAll()
+                // User registration endpoint should be public
+                .requestMatchers("/api/user/register","/api/user/login").permitAll()
+
+                .anyRequest().authenticated());//enable authentication for all requests except register
+		http.httpBasic(Customizer.withDefaults());//to get the basic auth on postman/swagger
 		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));//to create a new session for every request/stateless 
 		
 		return http.build();
