@@ -40,7 +40,7 @@ public class UserController {
                 return "login failed";
         }
     }
-
+//check the jwt token got as output on jwt.io website if it is valid token or not
 }
 //UsernamePasswordAuthenticationToken is inbuild in spring security
 // which will verify a username and password everytime it will generate a token,with that we can check if the user is valid or not
