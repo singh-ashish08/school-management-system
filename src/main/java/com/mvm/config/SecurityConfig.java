@@ -1,54 +1,47 @@
 package com.mvm.config;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-	
-	
-	@Autowired
-	private UserDetailsService  userDetailsService;//we have to provide implementation for this interface on service layer
-	
-	 @Bean
-	    public BCryptPasswordEncoder bCryptPasswordEncoder() {
 
-         return new BCryptPasswordEncoder(12);
-	    }
-	
-	@Bean
-	public AuthenticationProvider authProvider() { // used to provide authentication to user
-		
-		DaoAuthenticationProvider provider = new DaoAuthenticationProvider();//to connect with database
-		provider.setUserDetailsService(userDetailsService);
-		//provider.setPasswordEncoder(NoOpPasswordEncoder.getInstance());//NoOpPasswordEncoder is used when we don't need encoded password
-		provider.setPasswordEncoder(bCryptPasswordEncoder()); // ✅ use Spring bean line no. 28
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter; // make sure JwtAuthFilter is annotated @Component
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder(12);
+    }
+
+    @Bean
+    public AuthenticationProvider authProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService);
+        provider.setPasswordEncoder(bCryptPasswordEncoder());
         return provider;
-		
-	}
-	
-	//to change the default security configuration ,we have to return object of SecurityFilterChain 
-	
-	@Bean
-	public  SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception { 	
-		http.csrf(customizer->customizer.disable());//disable default csrf
-		http.authorizeHttpRequests(request->request
-                // Swagger should be public
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(customizer -> customizer.disable());
+
+        http.authorizeHttpRequests(request -> request
+                // Swagger + static should be public
                 .requestMatchers(
                         "/swagger-ui/**",
                         "/swagger-ui.html",
@@ -56,15 +49,22 @@ public class SecurityConfig {
                         "/swagger-resources/**",
                         "/webjars/**"
                 ).permitAll()
-                // User registration endpoint should be public
-                .requestMatchers("/api/user/register","/api/user/login").permitAll()
+                .requestMatchers("/api/user/register", "/api/user/login").permitAll()
+                .anyRequest().authenticated()
+        );
 
-                .anyRequest().authenticated());//enable authentication for all requests except register
-		http.httpBasic(Customizer.withDefaults());//to get the basic auth on postman/swagger
-		http.sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));//to create a new session for every request/stateless 
-		
-		return http.build();
-		}
+        // stateless session
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        // prevent browser basic auth popup (use JSON error)
+        http.exceptionHandling(e -> e.authenticationEntryPoint(new RestAuthenticationEntryPoint()));
+
+        // register your JwtAuthFilter instance (note: pass the autowired bean, not a method)
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}
 	
 		/*
 		 * //changing default setting of UserDetailsService //hardcoding the user values
@@ -82,4 +82,4 @@ public class SecurityConfig {
 		 * UserDetails }
 		 */
 
-}
+
