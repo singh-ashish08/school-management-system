@@ -28,7 +28,7 @@ public class JwtService {
         System.out.println("Generated Secret Key (Base64): " + secretKey);
     }
 
-    private String generateSecretKey() {
+    private String generateSecretKey() { // to generate a token you also need a secret key
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
             SecretKey secretKey = keyGen.generateKey();
@@ -45,13 +45,13 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 3)) // 3 minutes
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // expired in 30 minutes
+                .signWith(getKey(), SignatureAlgorithm.HS256)//to sign the token we are using HMAC SHA-256 algorithm
                 .compact();
     }
-//getKey called by generateToken method above
+//getKey called by generateToken method during sign the token
     private Key getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);//the secret key is passed here
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

@@ -31,10 +31,11 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(@RequestBody User user){
+       // check the user's authentication
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(user.getUserName(),user.getPassword()));
 
-        if(authentication.isAuthenticated()) {
+        if(authentication.isAuthenticated()) {//if user is authenticated the generate a token for  it.
             return jwtService.generateToken(user.getUserName());//create generateToken in JwtService class to generate token for the user passed into it
         }else{
                 return "login failed";
