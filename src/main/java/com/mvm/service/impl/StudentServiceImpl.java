@@ -57,35 +57,35 @@ public class StudentServiceImpl implements StudentService {
 		return allStudents.stream().map(s -> modelMapper.map(s, StudentResponseDto.class)).toList();
 	}
 
-	@Override
-	public StudentCreateDto update(StudentCreateDto student,long id) {
-		Student stu = new Student();
-		Optional<Student> getStudentFromDB = studentRepository.findById(id);
-		if(!getStudentFromDB.isPresent()) {
-			throw new ResourceNotFoundException("Student not found with the given id: " + id);
-		}else {
-		stu.setAddress(student.getAddress());
-		stu.setBloodGroup(student.getBloodGroup());
-		stu.setClassSection(student.getClassSection());
-		stu.setCourse(student.getCourse());
-		stu.setDateOfBirth(student.getDateOfBirth());
-		stu.setEmail(student.getEmail());
-		stu.setEmergencyContact(student.getEmergencyContact());
-		stu.setEnrollmentDate(student.getEnrollmentDate());
-		stu.setGuardianContact(student.getGuardianContact());
-		stu.setGuardianName(student.getGuardianName());
-		stu.setName(student.getName());
-		stu.setPhoneNumber(student.getPhoneNumber());
-		stu.setRollNumber(student.getRollNumber());
-		stu.setStatus(student.getStatus());
-		
-		}
-		Student updatedStudent = studentRepository.save(stu);
-		
-		return modelMapper.map(updatedStudent, StudentCreateDto.class);
-	}
+    @Override
+    public StudentCreateDto update(StudentCreateDto studentDto, long id) {
+        Student existingStudent = studentRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Student not found with the given id: " + id));
 
-	@Override
+        // Update fields
+        existingStudent.setAddress(studentDto.getAddress());
+        existingStudent.setBloodGroup(studentDto.getBloodGroup());
+        existingStudent.setClassSection(studentDto.getClassSection());
+        existingStudent.setCourse(studentDto.getCourse());
+        existingStudent.setDateOfBirth(studentDto.getDateOfBirth());
+        existingStudent.setEmail(studentDto.getEmail());
+        existingStudent.setEmergencyContact(studentDto.getEmergencyContact());
+        existingStudent.setEnrollmentDate(studentDto.getEnrollmentDate());
+        existingStudent.setGuardianContact(studentDto.getGuardianContact());
+        existingStudent.setGuardianName(studentDto.getGuardianName());
+        existingStudent.setName(studentDto.getName());
+        existingStudent.setPhoneNumber(studentDto.getPhoneNumber());
+        existingStudent.setRollNumber(studentDto.getRollNumber());
+        existingStudent.setStatus(studentDto.getStatus());
+
+        // Save updated entity
+        Student updatedStudent = studentRepository.save(existingStudent);
+
+        return modelMapper.map(updatedStudent, StudentCreateDto.class);
+    }
+
+
+    @Override
 	public void delete(long id) {
 		Optional<Student> student = studentRepository.findById(id);
 		if (!student.isPresent()) {
